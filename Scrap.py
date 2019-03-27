@@ -1,44 +1,65 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 import time
-import requests
-import re
 
-browser = webdriver.Chrome()
+chrome_options = Options()
+chrome_options.add_argument("--disable-notifications")
+chrome_options.add_argument("--disable-popup-blocking")
+chrome_options.add_argument("start-maximized")
+
+browser = webdriver.Chrome(chrome_options=chrome_options)
+
 browser.get('https://www.facebook.com/login')
 
 time.sleep(2)
 
 # LOGIN
 email = browser.find_element_by_id('email')
-email.send_keys('marcelogrsp@hotmail.com' + Keys.TAB)
+email.send_keys('your email' + Keys.TAB)
 
 password = browser.find_element_by_id('pass')
-password.send_keys('rVAnERxXjtng2Md!' + Keys.RETURN)
+password.send_keys('your password' + Keys.RETURN)
 
 # Go to Page Fans
-browser.get('https://www.facebook.com/search/160996273912155/likers?ref=about')
-
-time.sleep(2)
+pageId = 'id'
+browser.get('https://www.facebook.com/search/{}/likers?ref=about'.format(pageId))
 
 fb = browser.find_element_by_id('facebook')
 
-for i in range(5):
+# Scrool down to load more users
+for i in range(100):
     fb.send_keys(Keys.END)
-    time.sleep(2)
+    time.sleep(5)
 
-contacts = browser.find_elements_by_css_selector('._32mo span')
-
-for contact in contacts:
-    print(contact.text)
-
-time.sleep(4)
-
-# urls = browser.find_elements_by_partial_link_text('https://www.facebook.com/')
 urls = browser.find_elements_by_css_selector('._32mo')
 
+# Assign the profile url for each user
+usersList = []
+
 for url in urls:
-    user = url.get_attribute('href')
-    print(user)
-    p = re.compile(.*\/(.*)\?)
-    print(p)
+    user = str(url.get_attribute('href'))
+    urlSplit = user.split("/")
+    id = urlSplit[3]
+    listID = id.split("?")
+    id = listID[0]
+    usersList.append(id)
+
+
+for user in usersList:
+    if user != 'profile.php':
+        messageUrl = 'https://www.facebook.com/messages/t/{}'.format(user)
+
+        # Go to the Messenger page
+        browser.get(messageUrl)
+        
+        try:
+            alert = browser.switch_to.alert
+            alert.accept()
+        except:
+            pass
+
+        text = browser.switch_to.active_element
+        
+        message = 'Type your message here'       
+        text.send_keys(message + Keys.RETURN)
