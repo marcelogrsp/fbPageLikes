@@ -47,19 +47,4 @@ for url in urls:
 
 
 for user in usersList:
-    if user != 'profile.php':
-        messageUrl = 'https://www.facebook.com/messages/t/{}'.format(user)
-
-        # Go to the Messenger page
-        browser.get(messageUrl)
-        
-        try:
-            alert = browser.switch_to.alert
-            alert.accept()
-        except:
-            pass
-
-        text = browser.switch_to.active_element
-        
-        message = 'Type your message here'       
-        text.send_keys(message + Keys.RETURN)
+    print(user)
